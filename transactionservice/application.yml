@@ -1,0 +1,29 @@
+server:
+  port: 9002
+
+spring:
+  application:
+    name: transactionservice
+
+  datasource:
+    url: jdbc:mysql://host.docker.internal:3306/transaction_db?useSSL=false&allowPublicKeyRetrieval=true
+    username: dockeruser
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eurekaserver:8761/eureka/
+  instance:
+    prefer-ip-address: true
+    hostname: transactionservice
+    instance-id: $${spring.application.name}:$${server.port}

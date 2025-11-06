@@ -1,0 +1,41 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: apigateway
+
+  cloud:
+    gateway:
+      routes:
+        - id: customersaccsvc
+          uri: lb://customeraccsvc
+          predicates:
+            - Path=/customers/**
+        - id: transactionservice
+          uri: lb://transactionservice
+          predicates:
+            - Path=/transactions/**
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://eurekaserver:8761/eureka/
+  instance:
+    prefer-ip-address: true
+    hostname: apigateway
+    instance-id: $${spring.application.name}:$${server.port}
+
+logging:
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%-5level] [traceId=%X{traceId}] [%t] %c{1} - %msg%n"
+  level:
+    root: INFO
+    org.springframework.cloud.gateway: DEBUG
+    org.springframework.web: DEBUG

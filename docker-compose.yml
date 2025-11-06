@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  eurekaserver:
+    build: ./EurekaServer
+    container_name: eurekaserver
+    ports:
+      - "8761:8761"
+    networks:
+      - banknet
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8761"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: always
+
+  apigateway:
+    build: ./ApiGateway
+    container_name: apigateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      eurekaserver:
+        condition: service_healthy
+    networks:
+      - banknet
+    restart: always
+
+  customeraccsvc:
+    build: ./CustomersAccSvc
+    container_name: customeraccsvc
+    ports:
+      - "9001:9001"
+    depends_on:
+      eurekaserver:
+        condition: service_healthy
+    networks:
+      - banknet
+    restart: always
+
+  transactionservice:
+    build: ./transactionservice
+    container_name: transactionservice
+    ports:
+      - "9002:9002"
+    depends_on:
+      eurekaserver:
+        condition: service_healthy
+    networks:
+      - banknet
+    restart: always
+
+networks:
+  banknet:
+    driver: bridge
